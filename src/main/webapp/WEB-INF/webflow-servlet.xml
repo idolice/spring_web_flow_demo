@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:flow="http://www.springframework.org/schema/webflow-config"
+       xmlns:aop="http://www.springframework.org/schema/aop" 
+			 xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			 xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+
+       xsi:schemaLocation="
+							http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+              http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+              http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+              http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.2.xsd
+              http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+              http://www.springframework.org/schema/webflow-config http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.4.xsd
+              ">
+
+  <!-- **** BEGIN: Config files **** -->
+  <bean
+      class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>classpath*:config/*.properties</value>
+      </list>
+    </property>
+    <property name="ignoreResourceNotFound" value="true" />
+  </bean>
+  <!-- **** END: Config files **** -->
+
+  <mvc:annotation-driven />
+  <context:component-scan base-package="net.mikeski.webflow" />
+
+	<bean id="guessingGameService" class="net.mikeski.webflow.GuessingGameService"/>
+
+  <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:order="1">
+    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+    <property name="prefix" value="/WEB-INF/jsp/" />
+    <property name="suffix" value=".jsp" />
+  </bean>
+
+  <!--Define FlowHandlerMapping to tell DispatcherServlet (in web.xml)
+      to send flow requests to Spring Web Flow -->
+  <bean class="org.springframework.webflow.mvc.servlet.FlowHandlerMapping">
+    <property name="flowRegistry" ref="guessFlowRegistry" />
+  </bean>
+
+  <!-- Define FlowHandlerAdapter to handle Spring Web Flow request call.
+       This is the Controller class in Spring Web Flow -->
+  <bean class="org.springframework.webflow.mvc.servlet.FlowHandlerAdapter">
+    <property name="flowExecutor" ref="guessFlowExecutor" />
+  </bean>
+
+  <!-- Define the flow executor responsible for executing login web flow -->
+  <flow:flow-executor id="guessFlowExecutor" flow-registry="guessFlowRegistry"/>
+
+  <!-- Define the registry that holds references to all the flow related XML configuration-->
+  <flow:flow-registry id="guessFlowRegistry">
+    <flow:flow-location id="guessFlow" path="/WEB-INF/flows/guess-flow.xml"/>
+  </flow:flow-registry>
+
+</beans>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd">
+
+  <var name="guess" class="net.mikeski.webflow.Guess"/>
+
+  <!-- Display the login page -->
+  <view-state id="displayGuessForm" view="/WEB-INF/views/display_guess_form.jsp" model="guess">
+    <transition on="guessNumber" to="checkGuess"/>
+  </view-state>
+
+  <action-state id="checkGuess">
+    <evaluate expression="guessingGameService.guess(guess)"/>
+
+    <transition to="correctGuessView"/>
+
+    <transition on-exception="net.mikeski.webflow.OverException"
+                to="overGuessView"/>
+
+    <transition on-exception="net.mikeski.webflow.UnderException"
+                to="underGuessView"/>
+  </action-state>
+
+  <view-state id="correctGuessView" view="/WEB-INF/views/display_correct_guess.jsp"/>
+
+  <view-state id="overGuessView" view="/WEB-INF/views/display_over_guess.jsp" model="guess">
+    <transition on="guessNumber" to="checkGuess"/>
+	</view-state>
+
+  <view-state id="underGuessView" view="/WEB-INF/views/display_under_guess.jsp" model="guess">
+    <transition on="guessNumber" to="checkGuess"/>
+	</view-state>
+
+</flow>
